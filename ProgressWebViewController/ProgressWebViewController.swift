@@ -860,17 +860,18 @@ extension ProgressWebViewController {
     
     private func toogleToolBarVisibilityIfNeeded(scrollView:UIScrollView) {
         guard toogleToolBarOnScroll == true else {return}
+        // Credit: - https://stackoverflow.com/a/60978771/7551807
         let currentVelocityY =  scrollView.panGestureRecognizer.velocity(in: scrollView.superview).y
                    let currentVelocityYSign = Int(currentVelocityY).signum()
         if currentVelocityYSign != lastVelocityYSign &&
                        currentVelocityYSign != 0 {
                        lastVelocityYSign = currentVelocityYSign
                    }
-                   if lastVelocityYSign < 0 {
+                   if lastVelocityYSign < 0 { // User is scrolling toward the bottom.
                     self.navigationController?.setToolbarHidden(true, animated: true)
                     
-                   } else if lastVelocityYSign > 0 {
-                    self.navigationController?.setToolbarHidden(true, animated: true)
+                   } else if lastVelocityYSign > 0 { // User is scrolling toward the top.
+                    self.navigationController?.setToolbarHidden(false, animated: true)
                    }
      
         
