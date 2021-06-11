@@ -43,6 +43,8 @@ open class ProgressWebViewController: UIViewController {
     @available(iOS, obsoleted: 1.12.0, renamed: "defaultCookies")
     open var cookies: [HTTPCookie]?
     
+    open var customDoneButton:UIButton? = nil
+    
     open var defaultCookies: [HTTPCookie]? {
         didSet {
             var shouldReload = (defaultCookies != nil && oldValue == nil) || (defaultCookies == nil && oldValue != nil)
@@ -241,6 +243,8 @@ open class ProgressWebViewController: UIViewController {
         else if let url = url {
             load(url)
         }
+        
+        addGestureRecognizerForCustomDoneButton()
     }
     
     override open func viewWillAppear(_ animated: Bool) {
@@ -450,7 +454,7 @@ fileprivate extension ProgressWebViewController {
             .reload: reloadBarButtonItem,
             .stop: stopBarButtonItem,
             .activity: activityBarButtonItem,
-            .done: doneBarButtonItem,
+            .done: self.customDoneButton != nil ? UIBarButtonItem(customView: self.customDoneButton!) : doneBarButtonItem,
             .flexibleSpace: flexibleSpaceBarButtonItem
         ]
         
@@ -831,5 +835,17 @@ extension ProgressWebViewController: UIGestureRecognizerDelegate {
     
     func webViewDidTap(sender: UITapGestureRecognizer) {
       lastTapPosition = sender.location(in: view)
+    }
+}
+
+
+// MARK: - Custom buttons tap gesture handlers
+
+extension ProgressWebViewController {
+    
+    private func addGestureRecognizerForCustomDoneButton() {
+        guard self.customDoneButton != nil else {return}
+        self.customDoneButton?.addTarget(self, action: #selector(doneDidClick(sender:)), for: .touchUpInside)
+        self.customDoneButton?.isUserInteractionEnabled = true
     }
 }
