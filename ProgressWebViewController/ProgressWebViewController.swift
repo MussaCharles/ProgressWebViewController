@@ -151,6 +151,64 @@ open class ProgressWebViewController: UIViewController {
         return UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     }()
     
+    
+    public convenience init(
+        url: URL? = nil,
+        bypassedSSLHosts: [String]? = nil,
+        userAgent: String? = nil,
+        disableZoom: Bool = false,
+        navigationWay: NavigationWay = NavigationWay.browser,
+        pullToRefresh: Bool = false,
+        urlsHandledByApp: [String : Any] = [
+        "hosts": ["itunes.apple.com"],
+        "schemes": ["tel", "mailto", "sms"],
+        "_blank": true
+    ] as [String : Any],
+        cookies: [HTTPCookie]? = nil,
+        defaultCookies: [HTTPCookie]? = nil,
+        headers: [String : String]? = nil,
+        defaultHeaders: [String : String]? = nil,
+        isScrollEnabled: Bool = true,
+        delegate: ProgressWebViewControllerDelegate? = nil,
+        scrollViewDelegate: ProgressWebViewControllerScrollViewDelegate? = nil,
+        tintColor: UIColor? = nil,
+        websiteTitleInNavigationBar: Bool = true,
+        doneBarButtonItemPosition: NavigationBarPosition = .right,
+        leftNavigaionBarItemTypes: [BarButtonItemType] = [],
+        rightNavigaionBarItemTypes: [BarButtonItemType] = [],
+        toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity],
+        webView: WKWebView? = nil,
+        previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false),
+        previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false),
+        scrollToRefresh: Bool = false, lastTapPosition: CGPoint = CGPoint(x: 0, y: 0)) {
+        self.init()
+        self.url = url
+        self.bypassedSSLHosts = bypassedSSLHosts
+        self.userAgent = userAgent
+        self.disableZoom = disableZoom
+        self.navigationWay = navigationWay
+        self.pullToRefresh = pullToRefresh
+        self.urlsHandledByApp = urlsHandledByApp
+        self.defaultCookies = cookies
+        self.defaultCookies = defaultCookies
+        self.defaultHeaders = headers
+        self.defaultHeaders = defaultHeaders
+        self.isScrollEnabled = isScrollEnabled
+        self.delegate = delegate
+        self.scrollViewDelegate = scrollViewDelegate
+        self.tintColor = tintColor
+        self.websiteTitleInNavigationBar = websiteTitleInNavigationBar
+        self.doneBarButtonItemPosition = doneBarButtonItemPosition
+        self.leftNavigaionBarItemTypes = leftNavigaionBarItemTypes
+        self.rightNavigaionBarItemTypes = rightNavigaionBarItemTypes
+        self.toolbarItemTypes = toolbarItemTypes
+        self.webView = webView
+        self.previousNavigationBarState = previousNavigationBarState
+        self.previousToolbarState = previousToolbarState
+        self.scrollToRefresh = scrollToRefresh
+        self.lastTapPosition = lastTapPosition
+    }
+    
     public convenience init(_ progressWebViewController: ProgressWebViewController) {
         self.init()
         self.bypassedSSLHosts = progressWebViewController.bypassedSSLHosts
