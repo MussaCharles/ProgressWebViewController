@@ -29,6 +29,7 @@ let cookieKey = "Cookie"
 
 open class ProgressWebViewController: UIViewController {
     open var url: URL?
+    fileprivate var lastVelocityYSign = 0
     open var bypassedSSLHosts: [String]?
     open var userAgent: String?
     open var disableZoom = false
@@ -44,6 +45,7 @@ open class ProgressWebViewController: UIViewController {
     open var cookies: [HTTPCookie]?
     
     open var customDoneButton:UIButton? = nil
+    open var toogleToolBarOnScroll:Bool = false
     
     open var defaultCookies: [HTTPCookie]? {
         didSet {
@@ -779,6 +781,7 @@ extension ProgressWebViewController: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         scrollViewDelegate?.scrollViewDidScroll?(scrollView)
+        self.toogleToolBarVisibilityIfNeeded(scrollView: scrollView)
     }
 }
 
@@ -848,4 +851,31 @@ extension ProgressWebViewController {
         self.customDoneButton?.addTarget(self, action: #selector(doneDidClick(sender:)), for: .touchUpInside)
         self.customDoneButton?.isUserInteractionEnabled = true
     }
+}
+
+
+// MARK: - Toogle ToolBar on scrolling .
+
+extension ProgressWebViewController {
+    
+    private func toogleToolBarVisibilityIfNeeded(scrollView:UIScrollView) {
+        guard toogleToolBarOnScroll == true else {return}
+        let currentVelocityY =  scrollView.panGestureRecognizer.velocity(in: scrollView.superview).y
+                   let currentVelocityYSign = Int(currentVelocityY).signum()
+        if currentVelocityYSign != lastVelocityYSign &&
+                       currentVelocityYSign != 0 {
+                       lastVelocityYSign = currentVelocityYSign
+                   }
+                   if lastVelocityYSign < 0 {
+                    self.navigationController?.setToolbarHidden(true, animated: true)
+                    
+                   } else if lastVelocityYSign > 0 {
+                    self.navigationController?.setToolbarHidden(true, animated: true)
+                   }
+     
+        
+        
+        
+    }
+    
 }
