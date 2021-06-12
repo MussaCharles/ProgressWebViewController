@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        guard let identifier = segue.identifier, let url = URL(string: "https://m.post.naver.com/viewer/postView.nhn?volumeNo=31526768&memberNo=24772684"/*"https://www.google.com"*/) else {
+        guard let identifier = segue.identifier, let url = URL(string: "https://m.post.naver.com/viewer/postView.nhn?volumeNo=31655947&memberNo=24772684"/*"https://www.google.com"*/) else {
             return
         }
 
@@ -33,6 +33,8 @@ class ViewController: UIViewController {
             guard let navigationController = segue.destination as? UINavigationController, let progressWebViewController = navigationController.topViewController as? ProgressWebViewController else {
                 return
             }
+            
+            navigationController.navigationBar.isTranslucent = false 
 
             progressWebViewController.pullToRefresh = true
             progressWebViewController.url = url
@@ -46,6 +48,7 @@ class ViewController: UIViewController {
             
             progressWebViewController.toogleToolBarOnScroll = true
             progressWebViewController.openATagTabsOrNewWindowsNavigationType = .browser//.push
+            progressWebViewController.forceOpenAllURLSWithinTheApp = true
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return

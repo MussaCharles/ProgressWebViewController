@@ -76,6 +76,9 @@ open class ProgressWebViewController: UIViewController {
     /// Desired navigationType to open pages with <a href> (New tab or new window), Default = .browser.
     open var openATagTabsOrNewWindowsNavigationType:AtagsNavigationType = .browser
     
+    /// Force open all urls within the app. If this is set to true 'urlsHandledByApp' are ignored and the app will use webView to open all web links.
+    open var forceOpenAllURLSWithinTheApp:Bool = false
+    
     open var defaultCookies: [HTTPCookie]? {
         didSet {
             var shouldReload = (defaultCookies != nil && oldValue == nil) || (defaultCookies == nil && oldValue != nil)
@@ -425,6 +428,7 @@ public extension ProgressWebViewController {
         }
     }
     
+
     func pushWebViewController(url: URL) {
         let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
         progressWebViewController.url = url
@@ -668,6 +672,7 @@ fileprivate extension ProgressWebViewController {
     }
     
     func handleURLWithApp(_ url: URL, targetFrame: WKFrameInfo?) -> Bool {
+        guard forceOpenAllURLSWithinTheApp == false else {return false}
         let hosts = urlsHandledByApp["hosts"] as? [String]
         let schemes = urlsHandledByApp["schemes"] as? [String]
         let blank = urlsHandledByApp["_blank"] as? Bool
@@ -728,7 +733,6 @@ extension ProgressWebViewController: WKNavigationDelegate {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else {return}
                     self.presentWebViewController(url: url)
-                    self.setUpState()
                 }
             }
             
@@ -840,7 +844,19 @@ extension ProgressWebViewController: WKNavigationDelegate {
             fallthrough
         default:
             if navigationAction.targetFrame == nil {
-                pushWebViewController(url: url)
+                switch self.openATagTabsOrNewWindowsNavigationType {
+                case .browser:
+                    DispatchQueue.main.async {
+                        webView.load(navigationAction.request)
+                    }
+                    
+                case .present:
+                    presentWebViewController(url: url)
+                    
+                case .push:
+                    pushWebViewController(url: url)
+                }
+                
                 actionPolicy = .cancel
             }
         }
