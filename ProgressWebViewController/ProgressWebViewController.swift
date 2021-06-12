@@ -64,6 +64,15 @@ open class ProgressWebViewController: UIViewController {
     open var customDoneButton:UIButton? = nil
     open var toogleToolBarOnScroll:Bool = false
     
+    open var viewBackGroundColor:UIColor = {
+        if #available(iOS 13, *) {
+            return UIColor.systemBackground
+        } else {
+            return UIColor.white
+        }
+
+    }()
+    
     /// Desired navigationType to open pages with <a href> (New tab or new window), Default = .browser.
     open var openATagTabsOrNewWindowsNavigationType:AtagsNavigationType = .browser
     
@@ -205,10 +214,7 @@ open class ProgressWebViewController: UIViewController {
         let webConfiguration = WKWebViewConfiguration()
         webConfiguration.allowsInlineMediaPlayback = true
         let webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        if #available(iOS 13.0, *) {
-            webView.backgroundColor = .systemBackground
-        }
-        
+        webView.backgroundColor = self.viewBackGroundColor
         webView.uiDelegate = self
         webView.navigationDelegate = self
         webView.scrollView.delegate = self

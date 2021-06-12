@@ -41,6 +41,7 @@ class ViewController: UIViewController {
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Google Website"
             progressWebViewController.navigationWay = .browser
+            progressWebViewController.viewBackGroundColor = UIColor.white
 //            progressWebViewController.toolbarItemTypes = []//[.back, .forward, .reload, .activity]
             
             progressWebViewController.toogleToolBarOnScroll = true
