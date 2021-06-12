@@ -754,6 +754,10 @@ extension ProgressWebViewController: WKNavigationDelegate {
             }
             delegate?.progressWebViewController?(self, didFinish: url)
         }
+        
+        if !self.toolbarItemTypes.isEmpty {
+            self.navigationController?.setToolbarHidden(false, animated: true)
+        }
     }
     
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
