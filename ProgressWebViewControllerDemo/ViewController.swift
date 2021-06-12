@@ -41,7 +41,7 @@ class ViewController: UIViewController {
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Google Website"
             progressWebViewController.navigationWay = .push
-            progressWebViewController.toolbarItemTypes = [.reload, .activity]
+//            progressWebViewController.toolbarItemTypes = [.reload, .activity]
             
             progressWebViewController.toogleToolBarOnScroll = true
             progressWebViewController.openATagTabsOrNewWindowsNavigationType = .push

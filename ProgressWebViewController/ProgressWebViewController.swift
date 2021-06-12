@@ -405,8 +405,38 @@ public extension ProgressWebViewController {
     func pushWebViewController(url: URL) {
         let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
         progressWebViewController.url = url
+        progressWebViewController.pullToRefresh = self.pullToRefresh
+        progressWebViewController.bypassedSSLHosts = [url.host!]
+        progressWebViewController.customDoneButton = self.customDoneButton
+        progressWebViewController.toogleToolBarOnScroll = self.toogleToolBarOnScroll
+        progressWebViewController.openATagTabsOrNewWindowsNavigationType = self.openATagTabsOrNewWindowsNavigationType
+        progressWebViewController.websiteTitleInNavigationBar = self.websiteTitleInNavigationBar
+        progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
+        progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
         navigationController?.pushViewController(progressWebViewController, animated: true)
         setUpState()
+        updateBarButtonItems()
+    }
+    
+    func presentWebViewController(url: URL) {
+        let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
+        progressWebViewController.url = url
+        
+        let webNavVC = UINavigationController(rootViewController: progressWebViewController)
+        if let  progressWebViewController = webNavVC.topViewController as? ProgressWebViewController {
+            progressWebViewController.pullToRefresh = self.pullToRefresh
+            progressWebViewController.bypassedSSLHosts = [url.host!]
+            progressWebViewController.customDoneButton = self.customDoneButton
+            progressWebViewController.toogleToolBarOnScroll = self.toogleToolBarOnScroll
+            progressWebViewController.openATagTabsOrNewWindowsNavigationType = self.openATagTabsOrNewWindowsNavigationType
+            progressWebViewController.websiteTitleInNavigationBar = self.websiteTitleInNavigationBar
+            progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
+            progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
+        }
+        
+        self.present(webNavVC, animated: true)
+        setUpState()
+        updateBarButtonItems()
     }
 }
 
@@ -653,18 +683,17 @@ extension ProgressWebViewController: WKNavigationDelegate {
         guard   navigationAction.targetFrame == nil,
                 let url =  navigationAction.request.url else { return nil }
         // Create a new detail vc so that we can use iOS native UINavigationController's navigation types.
-        let detailVC = ProgressWebViewController(self)
-        detailVC.url = url
+   
         switch self.openATagTabsOrNewWindowsNavigationType {
         case .browser:
-            present(detailVC, animated: true, completion: nil)
+            self.presentWebViewController(url: url)
         case .push:
-            if let navigationController = navigationController {
-                navigationController.pushViewController(detailVC, animated: false)
-                return nil
+            if let _ = navigationController {
+                self.pushWebViewController(url: url)
             }else {
                 // Fall back to present type if there is no navigation controller.
-                present(detailVC, animated: true, completion: nil)
+                self.presentWebViewController(url: url)
+                setUpState()
             }
             
         }
@@ -888,7 +917,7 @@ extension ProgressWebViewController {
 extension ProgressWebViewController {
     
     private func toogleToolBarVisibilityIfNeeded(scrollView:UIScrollView) {
-        guard toogleToolBarOnScroll == true else {return}
+        guard toogleToolBarOnScroll == true && !self.toolbarItemTypes.isEmpty else {return}
         // Credit: - https://stackoverflow.com/a/60978771/7551807
         let currentVelocityY =  scrollView.panGestureRecognizer.velocity(in: scrollView.superview).y
                    let currentVelocityYSign = Int(currentVelocityY).signum()
