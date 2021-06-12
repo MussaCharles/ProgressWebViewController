@@ -13,6 +13,8 @@ let estimatedProgressKeyPath = "estimatedProgress"
 let titleKeyPath = "title"
 let cookieKey = "Cookie"
 
+
+
 @objc public protocol ProgressWebViewControllerDelegate {
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, canDismiss url: URL) -> Bool
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)
@@ -28,6 +30,21 @@ let cookieKey = "Cookie"
 }
 
 open class ProgressWebViewController: UIViewController {
+    
+    /// A navigation type to be used for web compoenents in a tags something like,  <a href>
+    public enum AtagsNavigationType {
+        
+        /// Open a new web page (Will be tracked automatically if you are using back and foward buttons on tool bar.
+        case openNewWebView
+        
+        /// Push to a new native viewController (You lose the auto tracking of back and next buttons on tool bar.
+        case push
+        
+        /// Present a new native viewController (You lose the auto tracking of back and next buttons on tool bar.
+        case present
+    }
+    
+    
     open var url: URL?
     fileprivate var lastVelocityYSign = 0
     open var bypassedSSLHosts: [String]?
@@ -48,7 +65,7 @@ open class ProgressWebViewController: UIViewController {
     open var toogleToolBarOnScroll:Bool = false
     
     /// Desired navigationType to open pages with <a href> (New tab or new window), Default = .browser.
-    open var openATagTabsOrNewWindowsNavigationType:NavigationWay = .browser
+    open var openATagTabsOrNewWindowsNavigationType:AtagsNavigationType = .openNewWebView
     
     open var defaultCookies: [HTTPCookie]? {
         didSet {
@@ -415,7 +432,6 @@ public extension ProgressWebViewController {
         progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
         navigationController?.pushViewController(progressWebViewController, animated: true)
         setUpState()
-        updateBarButtonItems()
     }
     
     func presentWebViewController(url: URL) {
@@ -436,7 +452,6 @@ public extension ProgressWebViewController {
         
         self.present(webNavVC, animated: true)
         setUpState()
-        updateBarButtonItems()
     }
 }
 
@@ -685,15 +700,30 @@ extension ProgressWebViewController: WKNavigationDelegate {
         // Create a new detail vc so that we can use iOS native UINavigationController's navigation types.
    
         switch self.openATagTabsOrNewWindowsNavigationType {
-        case .browser:
-            self.presentWebViewController(url: url)
+        
+        case .openNewWebView:
+            DispatchQueue.main.async {
+                webView.load(navigationAction.request)
+            }
+        
+        case .present:
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {return}
+                self.presentWebViewController(url: url)
+            }
         case .push:
             if let _ = navigationController {
-                self.pushWebViewController(url: url)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else {return}
+                    self.pushWebViewController(url: url)
+                }
             }else {
                 // Fall back to present type if there is no navigation controller.
-                self.presentWebViewController(url: url)
-                setUpState()
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else {return}
+                    self.presentWebViewController(url: url)
+                    self.setUpState()
+                }
             }
             
         }
