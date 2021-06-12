@@ -35,7 +35,7 @@ open class ProgressWebViewController: UIViewController {
     public enum AtagsNavigationType {
         
         /// Open a new web page (Will be tracked automatically if you are using back and foward buttons on tool bar.
-        case openNewWebView
+        case browser
         
         /// Push to a new native viewController (You lose the auto tracking of back and next buttons on tool bar.
         case push
@@ -65,7 +65,7 @@ open class ProgressWebViewController: UIViewController {
     open var toogleToolBarOnScroll:Bool = false
     
     /// Desired navigationType to open pages with <a href> (New tab or new window), Default = .browser.
-    open var openATagTabsOrNewWindowsNavigationType:AtagsNavigationType = .openNewWebView
+    open var openATagTabsOrNewWindowsNavigationType:AtagsNavigationType = .browser
     
     open var defaultCookies: [HTTPCookie]? {
         didSet {
@@ -701,7 +701,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
    
         switch self.openATagTabsOrNewWindowsNavigationType {
         
-        case .openNewWebView:
+        case .browser:
             DispatchQueue.main.async {
                 webView.load(navigationAction.request)
             }

@@ -40,11 +40,11 @@ class ViewController: UIViewController {
             progressWebViewController.userAgent = "ProgressWebViewController/1.0.0"
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Google Website"
-//            progressWebViewController.navigationWay = .push
-            progressWebViewController.toolbarItemTypes = [.back, .forward, .reload, .activity]
+            progressWebViewController.navigationWay = .push
+            progressWebViewController.toolbarItemTypes = []//[.back, .forward, .reload, .activity]
             
             progressWebViewController.toogleToolBarOnScroll = true
-            progressWebViewController.openATagTabsOrNewWindowsNavigationType = .openNewWebView
+            progressWebViewController.openATagTabsOrNewWindowsNavigationType = .push//.openNewWebView
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
