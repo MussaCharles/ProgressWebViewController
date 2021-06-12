@@ -47,6 +47,9 @@ open class ProgressWebViewController: UIViewController {
     open var customDoneButton:UIButton? = nil
     open var toogleToolBarOnScroll:Bool = false
     
+    /// Desired navigationType to open pages with <a href> (New tab or new window), Default = .browser.
+    open var openATagTabsOrNewWindowsNavigationType:NavigationWay = .browser
+    
     open var defaultCookies: [HTTPCookie]? {
         didSet {
             var shouldReload = (defaultCookies != nil && oldValue == nil) || (defaultCookies == nil && oldValue != nil)
@@ -644,6 +647,32 @@ extension ProgressWebViewController: WKUIDelegate {
 
 // MARK: - WKNavigationDelegate
 extension ProgressWebViewController: WKNavigationDelegate {
+    
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        // Credits: - https://stackoverflow.com/a/47828555/7551807
+        guard   navigationAction.targetFrame == nil,
+                let url =  navigationAction.request.url else { return nil }
+        // Create a new detail vc so that we can use iOS native UINavigationController's navigation types.
+        let detailVC = ProgressWebViewController(self)
+        detailVC.url = url
+        switch self.openATagTabsOrNewWindowsNavigationType {
+        case .browser:
+            present(detailVC, animated: true, completion: nil)
+        case .push:
+            if let navigationController = navigationController {
+                navigationController.pushViewController(detailVC, animated: false)
+                return nil
+            }else {
+                // Fall back to present type if there is no navigation controller.
+                present(detailVC, animated: true, completion: nil)
+            }
+            
+        }
+        
+        return nil
+        
+    }
+    
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         updateBarButtonItems()
         updateProgressViewFrame()
