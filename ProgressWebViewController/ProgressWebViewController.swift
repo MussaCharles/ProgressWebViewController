@@ -79,6 +79,9 @@ open class ProgressWebViewController: UIViewController {
     /// Force open all urls within the app. If this is set to true 'urlsHandledByApp' are ignored and the app will use webView to open all web links.
     open var forceOpenAllURLSWithinTheApp:Bool = false
     
+    open var customBackImage:UIImage? = nil
+    open var customNextImage:UIImage? = nil
+    
     open var defaultCookies: [HTTPCookie]? {
         didSet {
             var shouldReload = (defaultCookies != nil && oldValue == nil) || (defaultCookies == nil && oldValue != nil)
@@ -159,12 +162,19 @@ open class ProgressWebViewController: UIViewController {
 
     lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
-        return UIBarButtonItem(image: UIImage(named: "Back", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(backDidClick(sender:)))
+        return UIBarButtonItem(
+            image: self.customBackImage != nil ? self.customBackImage! : UIImage(named: "Back", in: bundle, compatibleWith: nil),
+            style: .plain, target: self,
+            action: #selector(backDidClick(sender:)))
     }()
     
     lazy fileprivate var forwardBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
-        return UIBarButtonItem(image: UIImage(named: "Forward", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(forwardDidClick(sender:)))
+        return UIBarButtonItem(
+            image: self.customNextImage != nil ? self.customNextImage! : UIImage(named: "Forward", in: bundle, compatibleWith: nil),
+            style: .plain,
+            target: self,
+            action: #selector(forwardDidClick(sender:)))
     }()
     
     lazy fileprivate var reloadBarButtonItem: UIBarButtonItem = {
@@ -440,6 +450,8 @@ public extension ProgressWebViewController {
         progressWebViewController.websiteTitleInNavigationBar = self.websiteTitleInNavigationBar
         progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
         progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
+        progressWebViewController.customBackImage = self.customBackImage
+        progressWebViewController.customNextImage = self.customNextImage
         navigationController?.pushViewController(progressWebViewController, animated: true)
         setUpState()
     }
@@ -458,6 +470,8 @@ public extension ProgressWebViewController {
             progressWebViewController.websiteTitleInNavigationBar = self.websiteTitleInNavigationBar
             progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
             progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
+            progressWebViewController.customBackImage = self.customBackImage
+            progressWebViewController.customNextImage = self.customNextImage
         }
         
         self.present(webNavVC, animated: true)
@@ -509,8 +523,8 @@ fileprivate extension ProgressWebViewController {
     
     func addBarButtonItems() {
         let barButtonItems: [BarButtonItemType: UIBarButtonItem] = [
-            .back: backBarButtonItem,
-            .forward: forwardBarButtonItem,
+            .back: self.customBackImage != nil ? UIBarButtonItem(image: self.customBackImage!, style: .plain, target: self, action: #selector(backDidClick(sender:))) : backBarButtonItem,
+            .forward:self.customNextImage != nil ?  UIBarButtonItem(image: self.customNextImage!, style: .plain, target: self, action: #selector(forwardDidClick(sender:))) : forwardBarButtonItem,
             .reload: reloadBarButtonItem,
             .stop: stopBarButtonItem,
             .activity: activityBarButtonItem,
@@ -694,7 +708,34 @@ fileprivate extension ProgressWebViewController {
     func isBlank(url: URL) -> Bool {
         return url.absoluteString == "about:blank"
     }
+    
+    
+    
+    /// A helper method to try opening the url with app if it's included in the provided custom hosts & schemes.
+    private func tryOpeningURLWithAppIfIsInCludedinCustomSchemes(_ url: URL){
+        let hosts = urlsHandledByApp["hosts"] as? [String]
+        let schemes = urlsHandledByApp["schemes"] as? [String]
+        
+        var tryToOpenURLWithApp = false
+        
+        defer {
+            if tryToOpenURLWithApp {
+                _ = openURLWithApp(url)
+            }
+        }
+        
+        if let host = url.host, hosts?.contains(host) ?? false {
+            tryToOpenURLWithApp = true
+        }
+        if let scheme = url.scheme, schemes?.contains(scheme) ?? false {
+            tryToOpenURLWithApp = true
+        }
+        
+    }
+
 }
+
+
 
 // MARK: - WKUIDelegate
 extension ProgressWebViewController: WKUIDelegate {
@@ -778,7 +819,11 @@ extension ProgressWebViewController: WKNavigationDelegate {
         }
         if let url = url {
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
+            
+            tryOpeningURLWithAppIfIsInCludedinCustomSchemes(url)
         }
+        
+        
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

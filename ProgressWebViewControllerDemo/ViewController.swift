@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        guard let identifier = segue.identifier, let url = URL(string: "https://m.post.naver.com/viewer/postView.nhn?volumeNo=31655947&memberNo=24772684"/*"https://www.google.com"*/) else {
+        guard let identifier = segue.identifier, let url = URL(string: "https://itunes.apple.com/app/line/id443904275?ls=1&mt=8"/*"https://www.google.com"*/) else {
             return
         }
 
@@ -34,7 +34,7 @@ class ViewController: UIViewController {
                 return
             }
             
-            navigationController.navigationBar.isTranslucent = false 
+            navigationController.navigationBar.isTranslucent = false
 
             progressWebViewController.pullToRefresh = true
             progressWebViewController.url = url
@@ -49,12 +49,21 @@ class ViewController: UIViewController {
             progressWebViewController.toogleToolBarOnScroll = true
             progressWebViewController.openATagTabsOrNewWindowsNavigationType = .browser//.push
             progressWebViewController.forceOpenAllURLSWithinTheApp = true
+            progressWebViewController.isScrollEnabled = true
+            
+            // Custom back arrows
+            progressWebViewController.customBackImage = UIImage(named: "CustomBackArrow")?.withRenderingMode(.alwaysTemplate)
+            progressWebViewController.customNextImage = UIImage(named: "CustomNextArrow")?.withRenderingMode(.alwaysTemplate)
+//            progressWebViewController.tintColor = UIColor.black
+        
+//            progressWebViewController.navigationController?.automaticallyAdjustsScrollViewInsets = false
+        
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
             }
             
-            progressWebViewController.isScrollEnabled = false
+            progressWebViewController.isScrollEnabled = true
             progressWebViewController.disableZoom = true
             progressWebViewController.toolbarItemTypes = [.back, .forward, .reload, .activity]
             progressWebViewController.url = url
