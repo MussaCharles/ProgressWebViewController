@@ -42,22 +42,19 @@ class ViewController: UIViewController {
             progressWebViewController.userAgent = "ProgressWebViewController/1.0.0"
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Google Website"
-            progressWebViewController.navigationWay = .browser
+            progressWebViewController.navigationWay = .push
             progressWebViewController.viewBackGroundColor = UIColor.white
 //            progressWebViewController.toolbarItemTypes = []//[.back, .forward, .reload, .activity]
             
             progressWebViewController.toogleToolBarOnScroll = true
-            progressWebViewController.openATagTabsOrNewWindowsNavigationType = .browser//.push
+            progressWebViewController.openATagTabsOrNewWindowsNavigationType = .push//.push
             progressWebViewController.forceOpenAllURLSWithinTheApp = true
             progressWebViewController.isScrollEnabled = true
             
-            // Custom back arrows
             progressWebViewController.backAndNextButtonApperance = .arrow
             progressWebViewController.tintColor = UIColor.black
             progressWebViewController.progressBarOnlyTintColor = UIColor.red
-//            progressWebViewController.tintColor = UIColor.black
-        
-//            progressWebViewController.navigationController?.automaticallyAdjustsScrollViewInsets = false
+
         
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {

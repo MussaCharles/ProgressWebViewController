@@ -480,6 +480,7 @@ public extension ProgressWebViewController {
         progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
         progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
         progressWebViewController.backAndNextButtonApperance = self.backAndNextButtonApperance
+        progressWebViewController.progressBarOnlyTintColor = self.progressBarOnlyTintColor
         navigationController?.pushViewController(progressWebViewController, animated: true)
         setUpState()
     }
@@ -499,6 +500,7 @@ public extension ProgressWebViewController {
             progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
             progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
             progressWebViewController.backAndNextButtonApperance = self.backAndNextButtonApperance
+            progressWebViewController.progressBarOnlyTintColor = self.progressBarOnlyTintColor
         }
         
         self.present(webNavVC, animated: true)
