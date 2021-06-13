@@ -711,26 +711,9 @@ fileprivate extension ProgressWebViewController {
     
     
     
-    /// A helper method to try opening the url with app if it's included in the provided custom hosts & schemes.
-    private func tryOpeningURLWithAppIfIsInCludedinCustomSchemes(_ url: URL){
-        let hosts = urlsHandledByApp["hosts"] as? [String]
-        let schemes = urlsHandledByApp["schemes"] as? [String]
-        
-        var tryToOpenURLWithApp = false
-        
-        defer {
-            if tryToOpenURLWithApp {
-                _ = openURLWithApp(url)
-            }
-        }
-        
-        if let host = url.host, hosts?.contains(host) ?? false {
-            tryToOpenURLWithApp = true
-        }
-        if let scheme = url.scheme, schemes?.contains(scheme) ?? false {
-            tryToOpenURLWithApp = true
-        }
-        
+    /// If there are no any logics to handle URL open failures then it might be good to forward all links which have failed to be opened to the default app browser so that it can take care of telling the user about the URL issue.
+    private func fallBackToOpenURLWithDefaultAppBrowser(_ url: URL){
+        _ = openURLWithApp(url)
     }
 
 }
@@ -820,7 +803,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
         if let url = url {
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
             
-            tryOpeningURLWithAppIfIsInCludedinCustomSchemes(url)
+            fallBackToOpenURLWithDefaultAppBrowser(url)
         }
         
         
