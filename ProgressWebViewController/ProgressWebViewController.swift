@@ -109,6 +109,20 @@ open class ProgressWebViewController: UIViewController {
     /// The apperance of the bottun, currently two appearnace types are suppported.
     open var backAndNextButtonApperance:BackAndNextButtonApperance = .iOSDefaultStyle
     
+    /// Array of event names to be notified of.
+    open var javaScriptEventNamesToListen:[String] = []
+    
+    lazy internal var contentController:WKUserContentController? = {
+        guard !self.javaScriptEventNamesToListen.isEmpty else {return nil}
+        
+        ///Add the script message handler into the content controller.
+        let contentController = WKUserContentController()
+        javaScriptEventNamesToListen.forEach { eventName in
+            contentController.add(self, name: eventName)
+        }
+        return contentController
+    }()
+    
     open var defaultCookies: [HTTPCookie]? {
         didSet {
             var shouldReload = (defaultCookies != nil && oldValue == nil) || (defaultCookies == nil && oldValue != nil)
@@ -1049,5 +1063,19 @@ extension ProgressWebViewController {
         
         
     }
+    
+}
+
+
+
+// MARK: - WKScriptMessageHandler
+
+extension ProgressWebViewController:WKScriptMessageHandler {
+    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        print("\n\n 🚀Received Javascript eventNamed: \(message)\n\n")
+    }
+    
+    
+
     
 }
