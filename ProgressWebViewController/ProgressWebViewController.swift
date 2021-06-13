@@ -44,6 +44,33 @@ open class ProgressWebViewController: UIViewController {
         case present
     }
     
+    public enum BackAndNextButtonApperance {
+        /// ⬅️ or ➡️
+        case arrow
+        /// Something like >
+        case iOSDefaultStyle
+        
+        var backImage:UIImage? {
+            let bundle = Bundle(for: ProgressWebViewController.self)
+            switch self {
+            case .arrow:
+                return  UIImage(named: "BackArrow", in: bundle, compatibleWith: nil)
+            case .iOSDefaultStyle:
+                return  UIImage(named: "Back", in: bundle, compatibleWith: nil)
+            }
+        }
+        
+        var nextImage:UIImage? {
+            let bundle = Bundle(for: ProgressWebViewController.self)
+            switch self {
+            case .arrow:
+                return  UIImage(named: "NextArrow", in: bundle, compatibleWith: nil)
+            case .iOSDefaultStyle:
+                return  UIImage(named: "Forward", in: bundle, compatibleWith: nil)
+            }
+        }
+    }
+    
     
     open var url: URL?
     fileprivate var lastVelocityYSign = 0
@@ -79,8 +106,8 @@ open class ProgressWebViewController: UIViewController {
     /// Force open all urls within the app. If this is set to true 'urlsHandledByApp' are ignored and the app will use webView to open all web links.
     open var forceOpenAllURLSWithinTheApp:Bool = false
     
-    open var customBackImage:UIImage? = nil
-    open var customNextImage:UIImage? = nil
+    /// The apperance of the bottun, currently two appearnace types are suppported.
+    open var backAndNextButtonApperance:BackAndNextButtonApperance = .iOSDefaultStyle
     
     open var defaultCookies: [HTTPCookie]? {
         didSet {
@@ -119,6 +146,8 @@ open class ProgressWebViewController: UIViewController {
     open var scrollViewDelegate: ProgressWebViewControllerScrollViewDelegate?
     
     open var tintColor: UIColor?
+    open var progressBarOnlyTintColor:UIColor?
+    
     open var websiteTitleInNavigationBar = true
     open var doneBarButtonItemPosition: NavigationBarPosition = .right
     open var leftNavigaionBarItemTypes: [BarButtonItemType] = []
@@ -163,7 +192,7 @@ open class ProgressWebViewController: UIViewController {
     lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
         return UIBarButtonItem(
-            image: self.customBackImage != nil ? self.customBackImage! : UIImage(named: "Back", in: bundle, compatibleWith: nil),
+            image: self.backAndNextButtonApperance.backImage,
             style: .plain, target: self,
             action: #selector(backDidClick(sender:)))
     }()
@@ -171,7 +200,7 @@ open class ProgressWebViewController: UIViewController {
     lazy fileprivate var forwardBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
         return UIBarButtonItem(
-            image: self.customNextImage != nil ? self.customNextImage! : UIImage(named: "Forward", in: bundle, compatibleWith: nil),
+            image: self.backAndNextButtonApperance.nextImage,
             style: .plain,
             target: self,
             action: #selector(forwardDidClick(sender:)))
@@ -450,8 +479,7 @@ public extension ProgressWebViewController {
         progressWebViewController.websiteTitleInNavigationBar = self.websiteTitleInNavigationBar
         progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
         progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
-        progressWebViewController.customBackImage = self.customBackImage
-        progressWebViewController.customNextImage = self.customNextImage
+        progressWebViewController.backAndNextButtonApperance = self.backAndNextButtonApperance
         navigationController?.pushViewController(progressWebViewController, animated: true)
         setUpState()
     }
@@ -470,8 +498,7 @@ public extension ProgressWebViewController {
             progressWebViewController.websiteTitleInNavigationBar = self.websiteTitleInNavigationBar
             progressWebViewController.toolbarItemTypes = self.toolbarItemTypes
             progressWebViewController.leftNavigaionBarItemTypes = self.leftNavigaionBarItemTypes
-            progressWebViewController.customBackImage = self.customBackImage
-            progressWebViewController.customNextImage = self.customNextImage
+            progressWebViewController.backAndNextButtonApperance = self.backAndNextButtonApperance
         }
         
         self.present(webNavVC, animated: true)
@@ -523,8 +550,8 @@ fileprivate extension ProgressWebViewController {
     
     func addBarButtonItems() {
         let barButtonItems: [BarButtonItemType: UIBarButtonItem] = [
-            .back: self.customBackImage != nil ? UIBarButtonItem(image: self.customBackImage!, style: .plain, target: self, action: #selector(backDidClick(sender:))) : backBarButtonItem,
-            .forward:self.customNextImage != nil ?  UIBarButtonItem(image: self.customNextImage!, style: .plain, target: self, action: #selector(forwardDidClick(sender:))) : forwardBarButtonItem,
+            .back: backBarButtonItem,
+            .forward:forwardBarButtonItem,
             .reload: reloadBarButtonItem,
             .stop: stopBarButtonItem,
             .activity: activityBarButtonItem,
@@ -627,7 +654,7 @@ fileprivate extension ProgressWebViewController {
         navigationController?.setToolbarHidden(toolbarItemTypes.count == 0, animated: true)
     
         if let tintColor = tintColor {
-            progressView.progressTintColor = tintColor
+            progressView.progressTintColor = self.progressBarOnlyTintColor ?? tintColor
             navigationController?.navigationBar.tintColor = tintColor
             navigationController?.toolbar.tintColor = tintColor
         }

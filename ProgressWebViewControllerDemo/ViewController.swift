@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        guard let identifier = segue.identifier, let url = URL(string: "https://itunes.apple.com/app/line/id443904275?ls=1&mt=8"/*"https://www.google.com"*/) else {
+        guard let identifier = segue.identifier, let url = URL(string: "https://m.post.naver.com/viewer/postView.nhn?volumeNo=31526768&memberNo=24772684"/*"https://www.google.com"*/) else {
             return
         }
 
@@ -52,8 +52,9 @@ class ViewController: UIViewController {
             progressWebViewController.isScrollEnabled = true
             
             // Custom back arrows
-            progressWebViewController.customBackImage = UIImage(named: "CustomBackArrow")?.withRenderingMode(.alwaysTemplate)
-            progressWebViewController.customNextImage = UIImage(named: "CustomNextArrow")?.withRenderingMode(.alwaysTemplate)
+            progressWebViewController.backAndNextButtonApperance = .arrow
+            progressWebViewController.tintColor = UIColor.black
+            progressWebViewController.progressBarOnlyTintColor = UIColor.red
 //            progressWebViewController.tintColor = UIColor.black
         
 //            progressWebViewController.navigationController?.automaticallyAdjustsScrollViewInsets = false
